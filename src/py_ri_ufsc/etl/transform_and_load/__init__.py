@@ -1,0 +1,1 @@
+from .main import transform_and_load_extracted_data_from_ri_api

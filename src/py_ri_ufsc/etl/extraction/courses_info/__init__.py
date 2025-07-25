@@ -1,0 +1,2 @@
+from .courses_ufsc import CursosUFSC
+from .utils import DIC_CAMPUS_CURSOS_CENTROS_SIGLAS,DIC_CAMPUS_CENTROS_COMPLETO_E_SIGLAS

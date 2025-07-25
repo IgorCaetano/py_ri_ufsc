@@ -1,0 +1,10 @@
+ftfy==6.3.1
+pandas==2.3.0
+pyarrow==20.0.0
+pooch==1.8.2
+tqdm==4.67.1
+ipykernel==6.29.5
+beautifulsoup4==4.13.4
+requests==2.32.4
+lxml==5.4.0
+br-gender==0.1.0

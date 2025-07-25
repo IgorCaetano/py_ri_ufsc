@@ -1,0 +1,2 @@
+# from py_ri_ufsc.etl.extraction.main import extract_data_from_ri_api
+from .courses_info import CursosUFSC,DIC_CAMPUS_CURSOS_CENTROS_SIGLAS,DIC_CAMPUS_CENTROS_COMPLETO_E_SIGLAS
