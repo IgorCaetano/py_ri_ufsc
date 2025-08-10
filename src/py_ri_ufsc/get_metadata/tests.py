@@ -183,6 +183,23 @@ def generate_mock_df(lines_amount : int = 10,
                      genders : dict = {"use":False,"values":[]},
                      languages : dict = {"use":False,"values":[]}
         ) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Gera um DataFrame do pandas com dados fictícios (mock data) para fins de teste.
+    - Permite a criação de um número customizado de linhas através do parâmetro `lines_amount`.
+    - Para cada coluna, o usuário pode especificar se ela deve ser incluída e fornecer uma lista de valores possíveis.
+    - Os dados para cada linha são selecionados aleatoriamente a partir das listas de valores fornecidas.
+    - Possui lógica especial para campos de múltiplos valores como 'authors' e 'subjects', criando strings realistas com itens separados por ';'.
+
+    ### Parâmetros
+    - lines_amount (int): O número de linhas (registros) a serem geradas no DataFrame.
+    - years, authors, etc. (dict): Uma série de dicionários, um para cada coluna potencial. Cada dicionário deve conter:
+        - "use" (bool): `True` para incluir esta coluna no DataFrame gerado.
+        - "values" (list): Uma lista com o conjunto de valores possíveis para serem sorteados para esta coluna.
+
+    ### Saídas
+    - pd.DataFrame: Um DataFrame do pandas contendo os dados fictícios gerados.
+    """
     data = []
     for _ in range(lines_amount):
         row = {}
@@ -315,6 +332,19 @@ def generate_mock_df(lines_amount : int = 10,
 # ['ufsc','universidade_federal_de_santa_catarina','santa_catarina','clipping'] # clipping é para imagens, a priori, da própria universidade
 
 class TestRIUFSC():
+    """
+    ### Funcionalidades
+    - Fornece um ambiente de testes dedicado para validar as funções de enriquecimento de dados do pipeline do Repositório Institucional da UFSC.
+    - Permite executar cada função de transformação de forma isolada.
+    - Oferece flexibilidade para testar com um DataFrame existente (passado no construtor ou no método) ou com dados fictícios (mock data) gerados automaticamente.
+    - É uma ferramenta essencial para depuração, verificação de lógica e garantia de qualidade do processo de ETL.
+
+    ### Parâmetros
+    - df (pd.DataFrame | None): Um DataFrame opcional para ser armazenado na instância da classe e utilizado como base para os testes.
+
+    ### Saídas
+    - N/A (trata-se da inicialização de um objeto de teste).
+    """
     def __init__(self,
                  df : pd.DataFrame|None = None):
         self.df = df
@@ -326,6 +356,19 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_authors : dict = DIC_USE_AUTHORS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_gender_by_name_into_df`, que infere o gênero a partir dos nomes dos autores.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de autores para o teste.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'authors'.
+        - mock_df_lines_amount (int): Número de linhas a serem geradas se usar dados fictícios.
+        - mock_authors (dict): Dicionário de configuração para gerar os dados fictícios de autores.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'gender_name' adicionada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'authors' not in df.keys():
                 raise KeyError('Necessário coluna "authors" no dataframe passado como parâmetro')
@@ -342,6 +385,19 @@ class TestRIUFSC():
                                         df : pd.DataFrame|None = None,
                                         mock_df_lines_amount : int = 10,
                                         mock_setSpecs : dict = DIC_USE_SETSPECS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_location_into_df`, que obtém a localização completa (breadcrumb) a partir da coluna 'setSpec'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'setSpec' para o teste.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'setSpec'.
+        - mock_df_lines_amount (int): Número de linhas a serem geradas se usar dados fictícios.
+        - mock_setSpecs (dict): Dicionário de configuração para gerar os dados fictícios de 'setSpec'.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com as colunas de localização adicionadas ('full_locations', 'first_com', 'last_col').
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'setSpec' not in df.keys():
                 raise KeyError('Necessário coluna "setSpec" no dataframe passado como parâmetro')
@@ -358,6 +414,20 @@ class TestRIUFSC():
                            df : pd.DataFrame|None = None,
                            mock_df_lines_amount : int = 10,
                            mock_setSpecs : dict = DIC_USE_SETSPECS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_curso_into_df`, que infere o curso a partir das colunas 'description' e 'full_locations'.
+        - Para gerar os dados de teste, primeiro cria as colunas de localização a partir de 'setSpec'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios para o teste.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste.
+        - mock_df_lines_amount (int): Número de linhas a serem geradas se usar dados fictícios.
+        - mock_setSpecs (dict): Dicionário de configuração para gerar os dados fictícios de 'setSpec' (necessário para criar a localização).
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'course' adicionada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             return insert_location_into_df(df)
         elif self.df is not None and isinstance(self.df,pd.DataFrame):
@@ -371,7 +441,21 @@ class TestRIUFSC():
                                          mock_df_lines_amount : int = 10,
                                          mock_descriptions : dict = DIC_USE_DESCRIPTIONS,
                                          return_list : bool = False) -> pd.DataFrame|list[str]:
-        
+        """
+        ### Funcionalidades
+        - Testa a função `get_curso_from_description` para validar a extração de nomes de cursos a partir de textos de descrição.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'description'.
+        - Opcionalmente, retorna apenas a lista de cursos extraídos em vez de um DataFrame.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'description'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_descriptions (dict): Configuração para gerar descrições fictícias.
+        - return_list (bool): Se `True`, retorna uma lista de cursos. Se `False`, retorna um DataFrame com a descrição e o curso correspondente.
+
+        ### Saídas
+        - pd.DataFrame | list[str]: O resultado do teste, como um DataFrame ou uma lista.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'description' not in df.keys():
                 raise KeyError('Necessário coluna "description" no dataframe passado como parâmetro')
@@ -395,6 +479,21 @@ class TestRIUFSC():
                                            mock_df_lines_amount : int = 10,
                                            mock_full_locations : dict = DIC_USE_FULL_LOCATIONS,
                                            return_list : bool = False) -> pd.DataFrame|list[str]:
+        """
+        ### Funcionalidades
+        - Testa a função `get_curso_from_full_location` para validar a extração de nomes de cursos a partir de trilhas de localização (breadcrumbs).
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'full_locations'.
+        - Opcionalmente, retorna apenas a lista de cursos extraídos.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'full_locations'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_full_locations (dict): Configuração para gerar localizações fictícias.
+        - return_list (bool): Se `True`, retorna uma lista de cursos. Se `False`, retorna um DataFrame com a localização e o curso correspondente.
+
+        ### Saídas
+        - pd.DataFrame | list[str]: O resultado do teste, como um DataFrame ou uma lista.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'full_locations' not in df.keys():
                 raise KeyError('Necessário coluna "full_locations" no dataframe passado como parâmetro')
@@ -417,6 +516,19 @@ class TestRIUFSC():
                                           df : pd.DataFrame|None = None,
                                           mock_df_lines_amount : int = 10,
                                           mock_types : dict = DIC_USE_TYPES) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_type_course_based_on_type_into_df`, que infere o nível do curso ('GRAD'/'POS') a partir da coluna 'type'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'type'.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'type'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_types (dict): Configuração para gerar tipos de trabalho fictícios.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'type_course' adicionada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'type' not in df.keys():
                 raise KeyError('Necessário coluna "type" no dataframe passado como parâmetro')
@@ -433,6 +545,19 @@ class TestRIUFSC():
                                           df : pd.DataFrame|None = None,
                                           mock_df_lines_amount : int = 10,
                                           mock_descriptions : dict = DIC_USE_DESCRIPTIONS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_type_curso_based_on_description_into_df`, que infere o nível do curso a partir da coluna 'description'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'description'.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'description'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_descriptions (dict): Configuração para gerar descrições fictícias.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'type_course' preenchida ou atualizada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'description' not in df.keys():
                 raise KeyError('Necessário coluna "description" no dataframe passado como parâmetro')
@@ -447,6 +572,19 @@ class TestRIUFSC():
                                                     df : pd.DataFrame|None = None,
                                                     mock_df_lines_amount : int = 10,
                                                     mock_descriptions : dict = DIC_USE_DESCRIPTIONS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_campus_from_description_into_df`, que infere o campus a partir da coluna 'description'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'description'.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'description'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_descriptions (dict): Configuração para gerar descrições fictícias.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'campus' adicionada ou atualizada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'description' not in df.keys():
                 raise KeyError('Necessário coluna "description" no dataframe passado como parâmetro')
@@ -464,6 +602,21 @@ class TestRIUFSC():
                                             mock_df_lines_amount : int = 10,
                                             mock_campus : dict = DIC_USE_CAMPUS,
                                             return_list : bool = False) -> pd.DataFrame|list[str]:
+        """
+        ### Funcionalidades
+        - Testa a função `get_list_of_centro_from_campus`, que infere o centro a partir do campus (para campi de centro único).
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'campus'.
+        - Opcionalmente, retorna apenas a lista de centros inferidos.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'campus'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_campus (dict): Configuração para gerar campi fictícios.
+        - return_list (bool): Se `True`, retorna uma lista de centros. Se `False`, retorna um DataFrame com campus e centro.
+
+        ### Saídas
+        - pd.DataFrame | list[str]: O resultado do teste, como um DataFrame ou uma lista.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'campus' not in df.keys():
                 raise KeyError('Necessário coluna "campus" no dataframe passado como parâmetro')
@@ -486,6 +639,21 @@ class TestRIUFSC():
                                     mock_df_lines_amount : int = 10,
                                     mock_descriptions : dict = DIC_USE_DESCRIPTIONS,
                                     return_list : bool = False) -> pd.DataFrame|list[str]:
+        """
+        ### Funcionalidades
+        - Testa a função `get_list_of_centro_from_description`, que infere o centro a partir do texto da descrição.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'description'.
+        - Opcionalmente, retorna apenas a lista de centros inferidos.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'description'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_descriptions (dict): Configuração para gerar descrições fictícias.
+        - return_list (bool): Se `True`, retorna uma lista de centros. Se `False`, retorna um DataFrame com descrição e centro.
+
+        ### Saídas
+        - pd.DataFrame | list[str]: O resultado do teste, como um DataFrame ou uma lista.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'description' not in df.keys():
                 raise KeyError('Necessário coluna "description" no dataframe passado como parâmetro')
@@ -508,6 +676,20 @@ class TestRIUFSC():
                                    mock_df_lines_amount : int = 10,
                                    mock_campus : dict = DIC_USE_CAMPUS,
                                    mock_descriptions : dict = DIC_USE_DESCRIPTIONS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `insert_centro_into_df`, que orquestra a inferência de centros a partir do campus e da descrição.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'campus' e 'description'.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter 'campus' e 'description'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_campus (dict): Configuração para gerar campi fictícios.
+        - mock_descriptions (dict): Configuração para gerar descrições fictícias.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'centro' adicionada ou atualizada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'description' not in df.keys():
                 raise KeyError('Necessário coluna "description" no dataframe passado como parâmetro')
@@ -529,6 +711,19 @@ class TestRIUFSC():
                                        df : pd.DataFrame|None = None,
                                        mock_df_lines_amount : int = 10,
                                        mock_centros : dict = DIC_USE_CENTROS) -> pd.DataFrame:
+        """
+        ### Funcionalidades
+        - Testa a função `adjust_campus_from_centro`, que realiza um ajuste final na coluna 'campus' com base no 'centro'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'centro'.
+
+        ### Parâmetros
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter 'centro' e 'campus'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_centros (dict): Configuração para gerar centros fictícios.
+
+        ### Saídas
+        - pd.DataFrame: O DataFrame resultante com a coluna 'campus' ajustada.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'centro' not in df.keys():
                 raise KeyError('Necessário coluna "centro" no dataframe passado como parâmetro')
@@ -554,6 +749,22 @@ class TestRIUFSC():
                           df : pd.DataFrame|None = None,
                           mock_df_lines_amount : int = 10,
                           mock_types : dict = DIC_USE_TYPES) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_types`, que filtra um DataFrame pela coluna 'type'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'type' para o teste.
+        - Retorna tanto o DataFrame original (ou o fictício gerado) quanto o DataFrame filtrado, permitindo uma comparação direta dos resultados.
+
+        ### Parâmetros
+        - types_to_filter (list[str]): A lista de tipos de trabalho a serem mantidos no filtro.
+        - exclude_empty_values (bool): Parâmetro a ser passado para a função de filtro, controlando a inclusão de valores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'type'.
+        - mock_df_lines_amount (int): Número de linhas a serem geradas se usar dados fictícios.
+        - mock_types (dict): Dicionário de configuração para gerar os dados fictícios de 'type'.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes do filtro e o DataFrame depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'type' not in df.keys():
                 raise KeyError('Necessário coluna "type" no dataframe passado como parâmetro')
@@ -574,6 +785,23 @@ class TestRIUFSC():
                           df : pd.DataFrame|None = None,
                           mock_df_lines_amount : int = 10,
                           mock_years : dict = DIC_USE_YEARS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_dates`, que filtra um DataFrame por um intervalo de anos.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'year' para o teste.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - year_start (int): O ano de início do intervalo do filtro.
+        - year_end (int): O ano de fim do intervalo do filtro.
+        - exclude_empty_values (bool): Parâmetro para controlar a inclusão de valores de ano vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'year'.
+        - mock_df_lines_amount (int): Número de linhas a serem geradas se usar dados fictícios.
+        - mock_years (dict): Dicionário de configuração para gerar os dados fictícios de 'year'.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'year' not in df.keys():
                 raise KeyError('Necessário coluna "year" no dataframe passado como parâmetro')
@@ -594,6 +822,23 @@ class TestRIUFSC():
                                     df : pd.DataFrame|None = None,
                                     mock_df_lines_amount : int = 10,
                                     mock_titles : dict = DIC_USE_TITLES) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_title_by_words`, que busca palavras-chave nos títulos.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'title'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - words (list[str]): Lista de palavras a serem buscadas.
+        - match_all (bool): Define se a busca deve corresponder a todas as palavras ou a qualquer uma.
+        - exclude_empty_values (bool): Controla a inclusão de títulos vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'title'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_titles (dict): Configuração para gerar títulos fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'title' not in df.keys():
                 raise KeyError('Necessário coluna "title" no dataframe passado como parâmetro')
@@ -614,6 +859,23 @@ class TestRIUFSC():
                              df : pd.DataFrame|None = None,
                              mock_df_lines_amount : int = 10,
                              mock_subjects : dict = DIC_USE_SUBJECTS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_subjects`, que busca palavras-chave nos assuntos.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'subjects'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - subjects (list[str]): Lista de assuntos a serem buscados.
+        - match_all (bool): Define se a busca deve corresponder a todos os assuntos ou a qualquer um.
+        - exclude_empty_values (bool): Controla a inclusão de assuntos vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'subjects'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_subjects (dict): Configuração para gerar assuntos fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'subjects' not in df.keys():
                 raise KeyError('Necessário coluna "subjects" no dataframe passado como parâmetro')
@@ -634,6 +896,23 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_authors : dict = DIC_USE_AUTHORS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_authors` e sua lógica avançada de correspondência de nomes.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'authors'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - authors_names (list[str]): Lista de nomes de autores a serem buscados.
+        - match_all (bool): Define se a busca deve corresponder a todos os autores ou a qualquer um.
+        - exclude_empty_values (bool): Controla a inclusão de autores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'authors'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_authors (dict): Configuração para gerar autores fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'authors' not in df.keys():
                 raise KeyError('Necessário coluna "authors" no dataframe passado como parâmetro')
@@ -654,6 +933,23 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_advisors : dict = DIC_USE_ADVISORS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_advisors` e sua lógica avançada de correspondência de nomes.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'advisors'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - advisor_names (list[str]): Lista de nomes de orientadores a serem buscados.
+        - match_all (bool): Define se a busca deve corresponder a todos os orientadores ou a qualquer um.
+        - exclude_empty_values (bool): Controla a inclusão de orientadores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'advisors'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_advisors (dict): Configuração para gerar orientadores fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'advisors' not in df.keys():
                 raise KeyError('Necessário coluna "advisors" no dataframe passado como parâmetro')
@@ -674,6 +970,23 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_genders : dict = DIC_USE_GENDERS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_gender`, que filtra por gênero.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'gender_name'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - genders (list[str]): Lista de gêneros a serem filtrados.
+        - just_contain (bool): Define se a busca deve ser por contenção ou correspondência exata.
+        - exclude_empty_values (bool): Controla a inclusão de gêneros vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'gender_name'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_genders (dict): Configuração para gerar gêneros fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'gender_name' not in df.keys():
                 raise KeyError('Necessário coluna "gender_name" no dataframe passado como parâmetro')
@@ -693,6 +1006,22 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_languages : dict = DIC_USE_LANGUAGES) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_language`, que filtra por idioma.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'language'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - languages (list[str]): Lista de idiomas a serem mantidos.
+        - exclude_empty_values (bool): Controla a inclusão de idiomas vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'language'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_languages (dict): Configuração para gerar idiomas fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'language' not in df.keys():
                 raise KeyError('Necessário coluna "language" no dataframe passado como parâmetro')
@@ -712,6 +1041,22 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_courses : dict = DIC_USE_COURSES) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_course`, que filtra um DataFrame pela coluna 'course'.
+        - Utiliza um DataFrame fornecido, o DataFrame da instância ou gera dados fictícios de 'course' para o teste.
+        - Retorna tanto o DataFrame original (ou o fictício gerado) quanto o DataFrame filtrado, permitindo uma comparação direta dos resultados.
+
+        ### Parâmetros
+        - courses (list[str]): A lista de nomes de cursos a serem mantidos no filtro.
+        - exclude_empty_values (bool): Parâmetro a ser passado para a função de filtro, controlando a inclusão de valores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'course'.
+        - mock_df_lines_amount (int): Número de linhas a serem geradas se usar dados fictícios.
+        - mock_courses (dict): Dicionário de configuração para gerar os dados fictícios de 'course'.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes do filtro e o DataFrame depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'course' not in df.keys():
                 raise KeyError('Necessário coluna "course" no dataframe passado como parâmetro')
@@ -731,6 +1076,22 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_type_courses : dict = DIC_USE_TYPE_COURSES) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_type_course`, que filtra um DataFrame pela coluna 'type_course' (GRAD/POS).
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'type_course'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - type_courses (list[str]): A lista de tipos de curso a serem mantidos ('GRAD', 'POS').
+        - exclude_empty_values (bool): Controla a inclusão de valores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'type_course'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_type_courses (dict): Configuração para gerar tipos de curso fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'type_course' not in df.keys():
                 raise KeyError('Necessário coluna "type_course" no dataframe passado como parâmetro')
@@ -750,6 +1111,22 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_centros : dict = DIC_USE_CENTROS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_centro`, que filtra um DataFrame pela coluna 'centro'.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'centro'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - centros (list[str]): A lista de siglas de centros a serem mantidos.
+        - exclude_empty_values (bool): Controla a inclusão de valores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'centro'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_centros (dict): Configuração para gerar centros fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'centro' not in df.keys():
                 raise KeyError('Necessário coluna "centro" no dataframe passado como parâmetro')
@@ -769,6 +1146,22 @@ class TestRIUFSC():
                             df : pd.DataFrame|None = None,
                             mock_df_lines_amount : int = 10,
                             mock_campuses : dict = DIC_USE_CAMPUS) -> tuple[pd.DataFrame,pd.DataFrame]:
+        """
+        ### Funcionalidades
+        - Testa a função `filter_campus`, que filtra um DataFrame pela coluna 'campus'.
+        - Utiliza um DataFrame fornecido, o da instância ou gera dados fictícios de 'campus'.
+        - Retorna o DataFrame original e o filtrado para comparação.
+
+        ### Parâmetros
+        - campuses (list[str]): A lista de siglas de campi a serem mantidos.
+        - exclude_empty_values (bool): Controla a inclusão de valores vazios.
+        - df (pd.DataFrame | None): DataFrame externo para o teste. Deve conter a coluna 'campus'.
+        - mock_df_lines_amount (int): Número de linhas para dados fictícios.
+        - mock_campuses (dict): Configuração para gerar campi fictícios.
+
+        ### Saídas
+        - tuple[pd.DataFrame, pd.DataFrame]: Uma tupla contendo o DataFrame antes e depois do filtro.
+        """
         if (df is not None) and isinstance(df,pd.DataFrame):
             if 'campus' not in df.keys():
                 raise KeyError('Necessário coluna "campus" no dataframe passado como parâmetro')

@@ -11,6 +11,25 @@ def transform_and_load_extracted_data_from_ri_api(dir_path_xml_files : str,
                                                   replace_existing_files: bool = True,
                                                   remove_extracted_files_after_done: bool = False,
                                                   logger: logging.Logger | None = None) -> bool:
+    """
+    ### Funcionalidades
+    - Orquestra o pipeline completo de ETL: extrai dados de múltiplos arquivos XML, transforma-os e carrega o resultado em um único arquivo Parquet.
+    - Itera sobre todos os arquivos `.xml` em um diretório de entrada.
+    - Para cada arquivo, extrai os dados brutos, os transforma em um DataFrame e aplica todo o pipeline de enriquecimento através da função `transform_df`.
+    - Escreve os dados processados de forma incremental (chunk a chunk) no arquivo Parquet de saída, otimizando o uso de memória.
+    - Gerencia a substituição de arquivos de saída existentes e a limpeza opcional dos arquivos XML de origem após o processamento.
+    - Retorna um status booleano indicando o sucesso ou a falha da operação.
+
+    ### Parâmetros
+    - dir_path_xml_files (str): O caminho para o diretório que contém os arquivos XML a serem processados.
+    - output_parquet_path (str): O caminho completo onde o arquivo Parquet final será salvo.
+    - replace_existing_files (bool): Se `True`, um arquivo Parquet existente no caminho de saída será removido e substituído. Se `False`, a função não fará nada se o arquivo já existir.
+    - remove_extracted_files_after_done (bool): Se `True`, os arquivos XML originais serão deletados do diretório de origem após a conclusão bem-sucedida do processo.
+    - logger (logging.Logger | None): Uma instância opcional de um logger para registrar o andamento, avisos e erros do processo.
+
+    ### Saídas
+    - bool: `True` se o processo for concluído com sucesso e o arquivo Parquet for gerado, `False` caso contrário.
+    """
     process_status = True
 
     if not replace_existing_files and os.path.exists(output_parquet_path):

@@ -1,9 +1,20 @@
+import re
 import pandas as pd
 from . .common.for_strings import format_text
 
 def clean_empty_rows(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
     """
-    Remove linhas com valores ausentes (NaN ou string vazia) nas colunas especificadas.
+    ### Funcionalidades
+    - Remove linhas de um DataFrame que contenham valores nulos (NaN) ou strings vazias em uma ou mais colunas especificadas.
+    - Garante que a operação seja feita em uma cópia do DataFrame para evitar efeitos colaterais (SettingWithCopyWarning).
+    - Reseta o índice do DataFrame resultante para manter a continuidade.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser limpo.
+    - columns (list[str]): Uma lista de nomes de colunas a serem verificadas para valores vazios.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame sem as linhas que continham valores vazios nas colunas especificadas.
     """
     # Garante que os índices não estão duplicados
     df = df.copy()
@@ -18,8 +29,18 @@ def clean_empty_rows(df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
 
 def filter_types(df: pd.DataFrame, types: list[str], exclude_empty_values: bool = True) -> pd.DataFrame:
     """
-    Filtra o DataFrame com base na coluna 'type', mantendo apenas os registros cujo valor está na lista 'types'.
-    Se 'include_empty' for True, também inclui linhas onde 'type' é string vazia "".
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base nos valores da coluna 'type'.
+    - Mantém apenas os registros cujo tipo está presente na lista `types` fornecida.
+    - Opcionalmente, pode incluir registros cujo tipo é 'NÃO ESPECIFICADO' se `exclude_empty_values` for `False`.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - types (list[str]): Uma lista de strings contendo os valores de 'type' a serem mantidos.
+    - exclude_empty_values (bool): Se `False`, inclui também as linhas onde o tipo é 'NÃO ESPECIFICADO'. Se `True`, filtra estritamente pela lista `types`.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem aos critérios de filtro.
     """
     df = df.copy()
     # if not exclude_empty_values: # Comentando porque já foi tratado anteriormente
@@ -33,6 +54,21 @@ def filter_types(df: pd.DataFrame, types: list[str], exclude_empty_values: bool 
     return df[mask]
 
 def filter_dates(df: pd.DataFrame, date_1: int, date_2: int,exclude_empty_values : bool = True) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base em um intervalo de anos (inclusivo), utilizando a coluna 'year'.
+    - Converte a coluna 'year' para um tipo numérico para a comparação, descartando valores que não podem ser convertidos.
+    - Opcionalmente, pode preservar as linhas onde o ano não foi identificado, rotulando-as como 'NÃO IDENTIFICADO' e mantendo-as no resultado final.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - date_1 (int): O ano de início do intervalo do filtro.
+    - date_2 (int): O ano de fim do intervalo do filtro.
+    - exclude_empty_values (bool): Se `False`, mantém as linhas com ano não identificado no resultado final. Se `True`, descarta essas linhas.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que estão dentro do intervalo de datas especificado (e opcionalmente as linhas sem data).
+    """
     df = df.copy()
     
     if not exclude_empty_values:
@@ -56,8 +92,22 @@ def filter_title_by_words(df: pd.DataFrame,
                           words: list[str],
                           match_all: bool = False,
                           exclude_empty_values: bool = True) -> pd.DataFrame:
-    import re
-    
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame buscando por uma ou mais palavras-chave na coluna 'title'.
+    - Realiza uma busca normalizada, ignorando acentos, capitalização e caracteres especiais tanto nas palavras-chave quanto nos títulos.
+    - Permite configurar o filtro para corresponder a *todas* as palavras (`match_all=True`) ou a *qualquer uma* delas (`match_all=False`).
+    - Opcionalmente, pode preservar as linhas onde o título não foi identificado.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - words (list[str]): A lista de palavras-chave a serem buscadas.
+    - match_all (bool): Se `True`, um título deve conter todas as palavras da lista. Se `False`, basta conter uma delas.
+    - exclude_empty_values (bool): Se `False`, mantém as linhas com título não identificado no resultado final. Se `True`, descarta essas linhas.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas cujos títulos correspondem aos critérios de busca.
+    """
     df = df.copy()
 
     # Isola os títulos vazios se for manter
@@ -99,6 +149,23 @@ def filter_subjects(df: pd.DataFrame,
                     subjects: list[str],
                     match_all: bool = False,
                     exclude_empty_values : bool = True) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame buscando por uma ou mais palavras-chave na coluna 'subjects'.
+    - A coluna 'subjects' pode conter múltiplos valores separados por ponto e vírgula (';').
+    - Realiza uma busca normalizada, ignorando acentos e capitalização.
+    - Permite configurar o filtro para corresponder a *todas* as palavras-chave (`match_all=True`) ou a *qualquer uma* delas (`match_all=False`).
+    - Opcionalmente, pode preservar as linhas onde os assuntos não foram identificados.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - subjects (list[str]): A lista de assuntos (palavras-chave) a serem buscados.
+    - match_all (bool): Se `True`, um registro deve conter todos os assuntos da lista. Se `False`, basta conter um deles.
+    - exclude_empty_values (bool): Se `False`, mantém as linhas sem assuntos no resultado final. Se `True`, descarta essas linhas.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem aos critérios de busca por assunto.
+    """
     df = df.copy()
 
     if not exclude_empty_values:
@@ -133,6 +200,24 @@ def filter_authors(df: pd.DataFrame,
                    author_names: list[str],
                    match_all: bool = False,
                    exclude_empty_values: bool = True) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra o DataFrame por nomes de autores com uma lógica de correspondência avançada.
+    - Lida com nomes no formato "Sobrenome, Nome" e nomes diretos.
+    - Permite correspondência flexível, onde nomes abreviados (ex: "I C Souza") podem corresponder a nomes completos (ex: "Igor Caetano Souza").
+    - Utiliza funções auxiliares para reordenar as partes do nome e realizar a correspondência ordenada.
+    - Permite filtrar por múltiplos autores, exigindo a presença de *todos* (`match_all=True`) ou de *pelo menos um* (`match_all=False`).
+    - Opcionalmente, pode preservar registros sem autores.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - author_names (list[str]): Uma lista com os nomes dos autores a serem buscados.
+    - match_all (bool): Se `True`, um registro deve conter todos os autores da lista. Se `False`, basta conter um deles.
+    - exclude_empty_values (bool): Se `False`, mantém as linhas sem autores no resultado final.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem aos autores especificados.
+    """
     df = df.copy()
 
     if not exclude_empty_values:
@@ -205,6 +290,22 @@ def filter_advisors(df: pd.DataFrame,
                     advisor_names: list[str],
                     match_all: bool = False,
                     exclude_empty_values : bool = True) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra o DataFrame por nomes de orientadores, aplicando a mesma lógica de correspondência avançada da função `filter_authors`.
+    - Lida com nomes no formato "Sobrenome, Nome" e permite correspondência com abreviações.
+    - Permite filtrar por múltiplos orientadores, exigindo a presença de *todos* (`match_all=True`) ou de *pelo menos um* (`match_all=False`).
+    - Opcionalmente, pode preservar registros sem orientadores.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - advisor_names (list[str]): Uma lista com os nomes dos orientadores a serem buscados.
+    - match_all (bool): Se `True`, um registro deve conter todos os orientadores da lista. Se `False`, basta conter um deles.
+    - exclude_empty_values (bool): Se `False`, mantém as linhas sem orientadores no resultado final.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem aos orientadores especificados.
+    """
     df = df.copy()
 
     if not exclude_empty_values:
@@ -275,6 +376,23 @@ def filter_gender(df: pd.DataFrame,
                   genders: list[str],
                   just_contain: bool = True,
                   exclude_empty_values : bool = False) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra o DataFrame com base na coluna 'gender_name'.
+    - Permite dois modos de operação:
+    - 1. `just_contain=True`: Mantém registros que contenham *pelo menos um* dos gêneros especificados (ex: filtrar por 'F' manterá registros 'F' e 'F,M').
+    - 2. `just_contain=False`: Mantém registros que correspondam *exatamente* a um dos valores na lista de gêneros.
+    - Opcionalmente, pode preservar registros sem gênero identificado.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - genders (list[str]): Uma lista de gêneros a serem buscados (ex: ['F'], ['M'], ['F', 'M']).
+    - just_contain (bool): Define o modo de correspondência (conter ou ser exato).
+    - exclude_empty_values (bool): Se `False`, mantém as linhas sem gênero no resultado final.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem ao filtro de gênero.
+    """
     df = df.copy()
     if not exclude_empty_values:
         df_empty_values = df[(df['gender_name']=='') | (df['gender_name'].isna()) | (df['gender_name'].isnull())]
@@ -301,6 +419,20 @@ def filter_gender(df: pd.DataFrame,
 def filter_language(df: pd.DataFrame,
                     languages: list[str],
                     exclude_empty_values : bool = False) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base nos valores da coluna 'language'.
+    - Mantém apenas os registros cujo idioma está presente na lista `languages` fornecida.
+    - Opcionalmente, pode incluir registros sem idioma definido, que são então rotulados como 'NÃO IDENTIFICADO'.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - languages (list[str]): Uma lista de strings contendo os códigos de idioma a serem mantidos.
+    - exclude_empty_values (bool): Se `False`, inclui também as linhas onde o idioma está ausente.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem ao filtro de idioma.
+    """
     df = df.copy()
 
     # if exclude_empty_values:
@@ -320,6 +452,20 @@ def filter_language(df: pd.DataFrame,
 def filter_course(df: pd.DataFrame,
                   courses: list[str],
                   exclude_empty_values : bool = False) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base nos valores da coluna 'course'.
+    - Mantém apenas os registros cujo nome do curso está presente na lista `courses` fornecida.
+    - Opcionalmente, pode incluir registros sem curso definido, que são então rotulados como 'NÃO IDENTIFICADO'.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - courses (list[str]): Uma lista de strings contendo os nomes dos cursos a serem mantidos.
+    - exclude_empty_values (bool): Se `False`, inclui também as linhas onde o curso está ausente.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem ao filtro de curso.
+    """
     df = df.copy()
     # if exclude_empty_values:
     #     df = clean_empty_rows(df=df,columns=['course'])
@@ -334,7 +480,23 @@ def filter_course(df: pd.DataFrame,
         df['course'] = df['course'].replace({'': 'NÃO IDENTIFICADO'})
         return df
 
-def filter_type_course(df: pd.DataFrame, type_courses: list[str], exclude_empty_values: bool = False) -> pd.DataFrame:
+def filter_type_course(df: pd.DataFrame,
+                       type_courses: list[str],
+                       exclude_empty_values: bool = False) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base nos valores da coluna 'type_course' (GRAD ou POS).
+    - Mantém apenas os registros cujo tipo de curso está presente na lista `type_courses` fornecida.
+    - Opcionalmente, pode incluir registros sem tipo de curso definido, que são então rotulados como 'NÃO IDENTIFICADO'.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - type_courses (list[str]): Uma lista de strings contendo os tipos de curso a serem mantidos.
+    - exclude_empty_values (bool): Se `False`, inclui também as linhas onde o tipo de curso está ausente.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem ao filtro de tipo de curso.
+    """
     df = df.copy()
     # if exclude_empty_values:
     #     df = clean_empty_rows(df=df,columns=['type_course'])
@@ -350,6 +512,20 @@ def filter_type_course(df: pd.DataFrame, type_courses: list[str], exclude_empty_
         return df
 
 def filter_centro(df: pd.DataFrame, centros: list[str], exclude_empty_values: bool = False) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base nos valores da coluna 'centro'.
+    - Mantém apenas os registros cuja sigla do centro está presente na lista `centros` fornecida.
+    - Opcionalmente, pode incluir registros sem centro definido, que são então rotulados como 'NÃO IDENTIFICADO'.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - centros (list[str]): Uma lista de strings contendo as siglas dos centros a serem mantidos.
+    - exclude_empty_values (bool): Se `False`, inclui também as linhas onde o centro está ausente.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem ao filtro de centro.
+    """
     df = df.copy()
     # if exclude_empty_values:
     #     df = clean_empty_rows(df=df,columns=['centro'])
@@ -364,7 +540,23 @@ def filter_centro(df: pd.DataFrame, centros: list[str], exclude_empty_values: bo
         df['centro'] = df['centro'].replace({'': 'NÃO IDENTIFICADO'})
         return df
 
-def filter_campus(df: pd.DataFrame, campuses: list[str], exclude_empty_values: bool = False) -> pd.DataFrame:
+def filter_campus(df: pd.DataFrame,
+                  campuses: list[str],
+                  exclude_empty_values: bool = False) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Filtra as linhas de um DataFrame com base nos valores da coluna 'campus'.
+    - Mantém apenas os registros cuja sigla do campus está presente na lista `campuses` fornecida.
+    - Opcionalmente, pode incluir registros sem campus definido, que são então rotulados como 'NÃO IDENTIFICADO'.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser filtrado.
+    - campuses (list[str]): Uma lista de strings contendo as siglas dos campi a serem mantidos.
+    - exclude_empty_values (bool): Se `False`, inclui também as linhas onde o campus está ausente.
+
+    ### Saídas
+    - pd.DataFrame: Um novo DataFrame contendo apenas as linhas que correspondem ao filtro de campus.
+    """
     df = df.copy()
     # if exclude_empty_values:
     #     df = clean_empty_rows(df=df,columns=['campus'])

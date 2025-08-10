@@ -173,6 +173,19 @@ DIC_CAMPUS_CENTROS_COMPLETO_E_SIGLAS = {'FLN':{'Centro de Ciências Agrárias':'
                                         'ARA':{'Centro de Ciências, Tecnologias e Saúde':'CTS'}}
 
 def format_cursos(curso : str) -> str:
+    """
+    ### Funcionalidades
+    - Aplica uma formatação de texto genérica ao nome do curso utilizando a função `format_text`.
+    - Remove as designações específicas "(acadêmico)" e "(profissional)" que possam existir na string.
+    - Remove quaisquer espaços em branco no início ou no final do texto.
+    - Converte a string resultante para o formato maiúsculo (UPPERCASE).
+
+    ### Parâmetros
+    - curso (str): O nome do curso que será formatado.
+
+    ### Saídas
+    - str: O nome do curso limpo, padronizado e em letras maiúsculas.
+    """
     return format_text(curso).replace('(acadêmico)','').replace('(profissional)','').strip().upper()
 
 # # def get_centros(areas : list[str],campus : list[str]) -> list[str]:
@@ -228,6 +241,20 @@ def format_cursos(curso : str) -> str:
 
 def get_centros(cursos : list[str],
                 campus : list[str]) -> list[str]:
+    """
+    ### Funcionalidades
+    - Obtém a sigla do centro de ensino correspondente para cada par de curso e campus fornecido.
+    - Processa as listas `cursos` and `campus` em paralelo, onde o item na posição 'i' de uma lista corresponde ao item na mesma posição da outra.
+    - Utiliza o dicionário global `DIC_CAMPUS_CURSOS_CENTROS_SIGLAS` para a consulta.
+    - Retorna uma string vazia para pares de curso/campus que não são encontrados no dicionário ou que são inválidos.
+
+    ### Parâmetros
+    - cursos (list[str]): Uma lista com os nomes dos cursos.
+    - campus (list[str]): Uma lista com os nomes dos campi, que deve ter o mesmo tamanho da lista de cursos.
+
+    ### Saídas
+    - list[str]: Uma lista de strings contendo a sigla do centro para cada par de entrada.
+    """
     centros = []
     for curso,campi in zip(cursos,campus):
         if curso.strip() and campi.strip():
@@ -242,6 +269,18 @@ def get_centros(cursos : list[str],
     return centros
 
 def format_campus(campus : str) -> str:
+    """
+    ### Funcionalidades
+    - Converte o nome completo de um campus da UFSC para sua sigla oficial de três letras.
+    - A verificação é feita de forma flexível, buscando o nome do campus dentro da string de entrada.
+    - Retorna uma string vazia caso o nome do campus não seja reconhecido.
+
+    ### Parâmetros
+    - campus (str): A string contendo o nome do campus a ser formatado.
+
+    ### Saídas
+    - str: A sigla de três letras correspondente (ex: 'FLN') ou uma string vazia para campus não catalogado.
+    """
     if 'Florianópolis' in campus:
         return 'FLN'
     elif 'Blumenau' in campus:
@@ -255,6 +294,18 @@ def format_campus(campus : str) -> str:
     return ''
 
 def insert_centro(df : pd.DataFrame) -> pd.DataFrame:
+    """
+    ### Funcionalidades
+    - Adiciona uma nova coluna chamada 'CENTRO' a um DataFrame do pandas.
+    - Popula a nova coluna com as siglas dos centros de ensino, determinadas a partir das colunas 'CURSO' e 'CAMPUS' existentes no DataFrame.
+    - Utiliza a função `get_centros` para realizar a busca das informações do centro.
+
+    ### Parâmetros
+    - df (pd.DataFrame): O DataFrame a ser modificado. Ele deve, obrigatoriamente, conter as colunas 'CURSO' e 'CAMPUS'.
+
+    ### Saídas
+    - pd.DataFrame: O DataFrame original com a adição da nova coluna 'CENTRO'.
+    """
     df['CENTRO'] = get_centros(cursos=df['CURSO'].to_list(),
                                campus=df['CAMPUS'].to_list())
     return df
