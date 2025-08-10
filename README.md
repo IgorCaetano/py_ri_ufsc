@@ -1,11 +1,15 @@
 # py_ri_ufsc
 
+
 ##  Conteúdos
 
 * [Sobre o Projeto](#sobre-o-projeto)
 * [Requisitos](#requisitos)
-* [Instalação e Uso](#instalação-e-uso)
-* [Exemplos de Código](#exemplos-de-código)
+* [Instalação e uso](#instalação-e-uso)
+* [Exemplos de uso](#exemplos-de-uso)
+* [Metadados disponíveis no dataset e seus respectivos significados](#metadados-disponíveis-no-dataset-e-seus-respectivos-significados)
+* [Testes e validações](#testes-e-validações)
+* [Observações e dicas](#observações-e-dicas)
 * [Autores](#autores)
 * [Licença](#licença)
 
@@ -21,7 +25,7 @@ Para executar este projeto, você precisará de:
 * Gerenciador de pacotes (`pip`).
 
 
-## Instalação e Uso
+## Instalação e uso
 
 1.  **Clone o repositório:**
     ```bash
@@ -195,10 +199,6 @@ Com isso, podemos verificar que o parâmetro `exported_columns` edita as colunas
 ---
 
 ## Metadados disponíveis no dataset e seus respectivos significados
-
-* **`identifier_header`**: O identificador único e universal para cada registro no repositório. É a "chave primária" do documento.
-* **`datestamp_header`**: A data e hora da última modificação do registro no sistema, indicando quando a informação foi atualizada pela última vez.
-* **`setSpec`**: Especifica a qual "conjunto" ou "coleção" o documento pertence dentro do repositório (ex: `col_123456789_128640` para Programa de Pós-Graduação em Engenharia de Automação e Sistemas).
 * **`title`**: Títulos.
 * **`authors`**: Autor(es) (se tiver mais de um(a), estarão separados por ";").
 * **`advisors`**: Orientador(es) (se tiver mais de um(a), estarão separados por ";").
@@ -214,22 +214,27 @@ Com isso, podemos verificar que o parâmetro `exported_columns` edita as colunas
 * **`abstract`**: O resumo (priorizando o escrito em português) contido no registro.
 * **`link_site`**: O link para a página de apresentação do item no site do repositório.
 * **`link_doc`**: O link direto para o documento (exclusivo para PDFs atualmente).
-* **`source_xml_file`**: O nome do arquivo XML original de onde os metadados foram extraídos na etapa de coleta de dados deste pacote, útil para rastreamento e auditoria **(metadado extra)**.
-* **`gender_name`**: O gênero (masculino "M"/feminino "F"/feminino e masculino "F,M") dos autores, inferido a partir do primeiro nome para fins de análise demográfica gênero "F,M" quer dizer que existem homens e mulheres nos autores do trabalho **(metadado extra)**.
-* **`full_locations`**: A estrutura hierárquica completa da localização do trabalho na universidade (ex: `UFSC -> CTC -> -> Teses e Dissertações -> ECA`) **(metadado extra)**.
-* **`first_com`**: A primeira comunidade na hierarquia do repositório (ex: `Teses e Dissertações`) **(metadado extra)**.
-* **`last_col`**: A última e mais específica coleção a que o item pertence (ex: `Trabalhos de Conclusão de Curso de Graduação em Sistemas da Informação`) **(metadado extra)**.
-* **`course`**: O nome do curso ao qual o trabalho está vinculado **(metadado extra)**.
-* **`type_course`**: O nível do curso (ex: `GRAD` para graduação, `POS` para pós-graduação) **(metadado extra)**.
-* **`campus`**: O campus da universidade (ex: `FLN`, `ARA`, `BLN`) **(metadado extra)**.
-* **`centro`**: O centro de ensino (ex: `CTC`, `CFH`, `CFM`) **(metadado extra)**.
-* **`year`**: O ano de publicação do trabalho, extraído de `issued_date` **(metadado extra)**.
+* **`identifier_header`**: O identificador único e universal para cada registro no repositório. É a "chave primária" do documento.
+* **`datestamp_header`**: A data e hora da última modificação do registro no sistema, indicando quando a informação foi atualizada pela última vez.
+* **`setSpec`**: Especifica a qual "conjunto" ou "coleção" o documento pertence dentro do repositório (ex: `col_123456789_128640` para Programa de Pós-Graduação em Engenharia de Automação e Sistemas).
+* **`source_xml_file` (metadado extra)**: O nome do arquivo XML original de onde os metadados foram extraídos na etapa de coleta de dados deste pacote, útil para rastreamento e auditoria.
+* **`gender_name` (metadado extra)**: O gênero (masculino "M"/feminino "F"/feminino e masculino "F,M") dos autores, inferido a partir do primeiro nome para fins de análise demográfica gênero "F,M" quer dizer que existem homens e mulheres nos autores do trabalho.
+* **`full_locations` (metadado extra)**: A estrutura hierárquica completa da localização do trabalho na universidade (ex: `UFSC -> CTC -> -> Teses e Dissertações -> ECA`).
+* **`first_com` (metadado extra)**: A primeira comunidade na hierarquia do repositório (ex: `Teses e Dissertações`).
+* **`last_col` (metadado extra)**: A última e mais específica coleção a que o item pertence (ex: `Trabalhos de Conclusão de Curso de Graduação em Sistemas da Informação`).
+* **`course` (metadado extra)**: O nome do curso ao qual o trabalho está vinculado.
+* **`type_course` (metadado extra)**: O nível do curso (ex: `GRAD` para graduação, `POS` para pós-graduação).
+* **`campus` (metadado extra)**: O campus da universidade (ex: `FLN`, `ARA`, `BLN`).
+* **`centro` (metadado extra)**: O centro de ensino (ex: `CTC`, `CFH`, `CFM`).
+* **`year` (metadado extra)**: O ano de publicação do trabalho, extraído de `issued_date`.
+
+Os metadados "extras" foram enriquecidos no dataset original (adicionados por meio dos dados originais).
 
 ---
 
 ## Testes e validações
 
-Se você ficou curioso para entender melhor como os motores de consulta e filtro funcionam dentro desse pacote, foi preparado uma classe especial para o desenvolvimento de teste e validações chamada TestRIUFSC(). Nela você pode verificar o funcionamento e adquirir segurança nos metadados extras (enriquecidos) no dataset.
+Se você ficou curioso para entender melhor como os motores de consulta e filtro funcionam dentro desse pacote, foi preparado uma classe especial para o desenvolvimento de teste e validações chamada `TestRIUFSC()`. Nela você pode verificar o funcionamento e adquirir segurança nos metadados extras (enriquecidos) no dataset.
 
 ### Testes de enriquecimento de dados
 
@@ -237,7 +242,7 @@ Se você ficou curioso para entender melhor como os motores de consulta e filtro
 <summary>Teste 1: Coleta de gênero dos autores por meio do primeiro nome <i>(clique para expandir)</i></summary>
 <br>
 
-Digamos que você quer "ver com os próprios" olhos o funcionamento da lógica que analisa o gênero dos autores com base no (primeiro) nome. Para isso, pode-se seguir os seguintes passos:
+Digamos que você quer "ver com os próprios olhos" o funcionamento da lógica que analisa o gênero dos autores com base no (primeiro) nome. Para isso, pode-se seguir os seguintes passos:
 
 1. Importar a classe de teste do pacote.
 ```python
@@ -378,11 +383,13 @@ Isso irá mostrar o resultado de um dataframe com uma coluna de campus `campus` 
 
 ---
 
-## Observações/dicas
+## Observações e dicas
 
 - Existem diversas funcionalidades neste pacote, todas as funções, parâmetros disponíveis, usabilidade, etc estão descritas com detalhes nas suas respectivas docstrings (pequenos textos informativos para cada função/método), type hints e alguns comentários para facilitar o entendimento ao desenvolver em tempo real os códigos.
 
 - Nas versões mais atualizadas do Visual Studio Code, com a extensão do Python instalada, pode-se visualizar a docstring das funções e métodos simplesmente passando o mouse por cima de seu nome dentro do seu código.
+
+![gif_docstrings](gif_docstrings.gif)
 
 ---
 
