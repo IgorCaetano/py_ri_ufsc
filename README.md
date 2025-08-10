@@ -1,5 +1,6 @@
 # py_ri_ufsc
 
+*Se você está visualizando esta documentação no PyPI, por favor, visite a documentação no [GitHub](https://github.com/IgorCaetano/py_ri_ufsc) para uma versão mais completa.*
 
 ##  Conteúdos
 
@@ -15,7 +16,7 @@
 
 ## Sobre o Projeto
 
-Este pacote é o resultado de um Projeto de Fim de Curso do graduando Igor Caetano de Souza do curso de Engenharia de Controle e automação da Universidade Federal de Santa Catarina. O objetivo principal do projeto foi construir um pacote em Python que facilitasse o acesso e análise dos metadados presentes no Repositório Institucional da UFSC (RIUFSC).
+Este pacote é o resultado de um Projeto de Fim de Curso do graduando Igor Caetano de Souza do curso de Engenharia de Controle e Automação da Universidade Federal de Santa Catarina. O objetivo principal do projeto foi construir um pacote em Python que facilitasse o acesso e análise dos metadados presentes no Repositório Institucional da UFSC (RIUFSC).
 
 ## Requisitos
 
@@ -27,10 +28,15 @@ Para executar este projeto, você precisará de:
 
 ## Instalação e uso
 
-1.  **Clone o repositório:**
+O pacote está disponível no [Python Package Index (PyPI)](https://pypi.org/project/py-ri-ufsc/).
+
+1.  **Instale o pacote via `pip install`:**
     ```bash
-    pip install py-ri-ufsc
+    pip install py-ri-ufsc -U
     ```
+    Adicione "-U" para baixar o pacote disponível mais atualizado.
+    
+    *A instalação pode levar alguns minutos, pois há dependência de outras bibliotecas do Python, listadas no arquivo `requirements.txt` do projeto.*
 
 2.  **Uso principal:**
 
@@ -40,7 +46,7 @@ Para executar este projeto, você precisará de:
     from py_ri_ufsc import RIUFSC
 
     # Instanciando um objeto da classe principal
-    ri_ufsc = RIUFSC()    
+    ri_ufsc = RIUFSC()
     ```
     ---
 
@@ -264,11 +270,11 @@ Os valores da coluna processada (`authors`) são gerados de forma aleatória por
 
 Se você gostaria de passar os próprios nomes para teste, pode-se seguir pelo seguinte caminho:
 ```python
-test_ri_ufsc.test_gender_by_name(mock_df_lines_amount=5, # Seta o número de linhas do dataframe testado
-                                 mock_authors={"use":True, # Necessário passar parâmetro True para chave "use"
-                                               "values":['Souza, Igor Caetano de', # Lista para teste na chave "values"
-                                                         'Silva, Franciele Dias da',
-                                                         'Soares, Henrique']})
+df_test = test_ri_ufsc.test_gender_by_name(mock_df_lines_amount=5, # Seta o número de linhas do dataframe testado
+                                           mock_authors={"use":True, # Necessário passar parâmetro True para chave "use"
+                                                         "values":['Souza, Igor Caetano de', # Lista para teste na chave "values"
+                                                                   'Silva, Franciele Dias da',
+                                                                   'Soares, Henrique']})
 ```
 </details>
 
@@ -306,6 +312,14 @@ Toda vez que você executar `test_insert_type_course_from_type()`, os valores da
 A coleta de curso é uma etapa importantíssima no enriquecimento do dataset disponibilizado por este pacote. Tal coleta usa, inicialmente, a descrição do registro para tentar identificar o curso.
 
 Para verificar o funcionamento, podemos testar da seguinte forma:
+
+0. Dica extra para melhorar visualização de colunas com muitos dados, execute os seguintes códigos:
+```python
+import pandas as pd
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 0)
+pd.set_option('display.max_colwidth', None)
+```
 
 1. Importar a classe de teste do pacote.
 ```python
@@ -366,7 +380,7 @@ test_ri_ufsc = TestRIUFSC()
 ```
 2. Gerar um dataframe com os dados processados:
 ```python
-test_ri_ufsc.test_get_list_of_centro_from_campus()
+df_test = test_ri_ufsc.test_get_list_of_centro_from_campus()
 ```
 3. Visualizar o resultado do dataframe de teste. No caso de execução em (jupyter) notebook, podemos usar o comando `display()`:
 ```python

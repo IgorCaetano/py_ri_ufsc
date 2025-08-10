@@ -8,7 +8,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="py_ri_ufsc",
-    version="0.8",
+    version="0.9",
     description="Program designed to handle searches in metadata stored in UFSC Institutional Repository",
     long_description=long_description,
     long_description_content_type="text/markdown",
