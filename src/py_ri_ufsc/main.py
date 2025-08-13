@@ -79,7 +79,7 @@ class RIUFSC():
         return get_available_values_in_dataset(column_name=column_name,silence=self.silence,
                                                show_amount=show_amount)
 
-    def get_raw_ri_ufsc_dataset(self,columns_to_use : list[str]) -> pd.DataFrame:
+    def get_raw_ri_ufsc_dataset(self,columns_to_use : list[str]|None = None) -> pd.DataFrame:
         """
         ### Funcionalidades
         - Carrega dados do arquivo Parquet principal para um DataFrame do pandas.

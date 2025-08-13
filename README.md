@@ -48,7 +48,16 @@ O pacote está disponível no [Python Package Index (PyPI)](https://pypi.org/pro
     # Instanciando um objeto da classe principal
     ri_ufsc = RIUFSC()
     ```
-    ---
+    
+    Após a execução de `from py_ri_ufsc import RIUFSC`, a importação do dataset será realizada e você poderá visualizar uma tela como esta:
+
+    ![img-alt](dataset_download.png)
+
+    Esse download só será realizado uma vez no ambiente de execução atual.
+
+    *Caso você crie um novo ambiente virtual, por exemplo, será necessário realizar o download do dataset neste novo ambiente novamente ao importar a biblioteca.*
+
+---
 
 ## Exemplos de uso
 

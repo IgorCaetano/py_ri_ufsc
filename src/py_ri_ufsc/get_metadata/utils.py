@@ -68,7 +68,7 @@ def get_available_values_in_dataset(column_name : str,show_amount : bool = True,
         else:
             return [str(item) for item,count in counts.items()]
 
-def get_raw_dataset(columns_to_use : list[str]) -> pd.DataFrame:
+def get_raw_dataset(columns_to_use : list[str]|None = None) -> pd.DataFrame:
     """
     ### Funcionalidades
     - Carrega dados do arquivo Parquet principal para um DataFrame do pandas.
