@@ -17,6 +17,7 @@
 ## Sobre o Projeto
 
 Este pacote é o resultado de um Projeto de Fim de Curso do graduando Igor Caetano de Souza do curso de Engenharia de Controle e Automação da Universidade Federal de Santa Catarina. O objetivo principal do projeto foi construir um pacote em Python que facilitasse o acesso e análise dos metadados presentes no Repositório Institucional da UFSC (RIUFSC).
+O documento do TCC/PFC está disponível por meio deste [link](https://repositorio.ufsc.br/bitstream/handle/123456789/267496/TCC.pdf?sequence=1&isAllowed=y).
 
 ## Requisitos
 
